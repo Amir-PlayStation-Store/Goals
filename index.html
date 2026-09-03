@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NEXUS // Goal Matrix</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#07090e">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --panel-bg: rgba(15, 20, 32, 0.75);
+      --panel-border: rgba(0, 240, 255, 0.15);
+      --accent-cyan: #00f0ff;
+      --accent-glow: rgba(0, 240, 255, 0.4);
+      --neon-green: #00ffaa;
+      --neon-green-glow: rgba(0, 255, 170, 0.5);
+      --neon-purple: #a855f7;
+      --neon-purple-glow: rgba(168, 85, 247, 0.4);
+      --text-main: #f1f5f9;
+      --text-dim: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.08) 0%, transparent 70%),
+        linear-gradient(to bottom, #07090e 0%, #0a0d16 100%);
+      color: var(--text-main);
+      font-family: 'Rajdhani', sans-serif;
+      padding: 16px 12px 30px;
+      min-height: 100vh;
+    }
+
+    /* Top Navigation Bar */
+    .app-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 18px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px;
+    }
+    .app-title {
+      font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 900;
+      color: var(--accent-cyan); text-shadow: 0 0 10px var(--accent-glow); letter-spacing: 1.5px;
+    }
+    .nav-pills { display: flex; gap: 8px; }
+    .pill {
+      background: rgba(0, 240, 255, 0.05); border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan); padding: 5px 12px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .pill.purple { border-color: var(--neon-purple); color: var(--neon-purple); }
+
+    /* Input Panel */
+    .input-group { display: flex; gap: 8px; margin-bottom: 18px; }
+    input[type="text"] {
+      flex: 1; background: var(--panel-bg); border: 1px solid var(--panel-border);
+      color: #fff; padding: 12px 14px; border-radius: 10px; font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem; outline: none; transition: 0.3s;
+    }
+    input[type="text"]:focus { border-color: var(--accent-cyan); box-shadow: 0 0 12px var(--accent-glow); }
+    .btn-add {
+      background: linear-gradient(135deg, var(--accent-cyan), #00a8ff);
+      color: #000; border: none; padding: 0 18px; border-radius: 10px;
+      font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* Overall Progress Bar */
+    .overall-card {
+      background: var(--panel-bg); border: 1px solid var(--panel-border);
+      border-radius: 14px; padding: 12px 16px; margin-bottom: 20px; backdrop-filter: blur(10px);
+    }
+    .overall-header { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; }
+    .overall-label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+    .overall-val { color: var(--neon-green); font-family: 'Orbitron', sans-serif; text-shadow: 0 0 8px var(--neon-green-glow); }
+    .progress-track { height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-cyan), var(--neon-green)); transition: width 0.4s ease; box-shadow: 0 0 10px var(--neon-green-glow); }
+
+    /* Main Grid Layout */
+    .matrix-container { display: flex; gap: 12px; }
+    
+    /* Left Objectives Column */
+    .goals-column { width: 155px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
+    .col-title {
+      font-family: 'Orbitron', sans-serif; font-size: 0.75rem; color: var(--text-dim);
+      letter-spacing: 1.5px; height: 32px; display: flex; align-items: center; border-bottom: 1px solid var(--panel-border);
+    }
+    .goal-card {
+      height: 48px; background: var(--panel-bg); border: 1px solid var(--panel-border);
+      border-radius: 10px; padding: 0 10px; display: flex; flex-direction: column; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .goal-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent-cyan);
+    }
+    .goal-name { font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .goal-stats { display: flex; justify-content: space-between; font-size: 0.7rem; margin-top: 2px; }
+    .pct-text { color: var(--accent-cyan); font-weight: 700; }
+
+    /* Right Days Grid Column */
+    .grid-column { flex: 1; overflow-x: auto; display: flex; flex-direction: column; gap: 8px; scrollbar-width: none; }
+    .grid-column::-webkit-scrollbar { display: none; }
+    .days-header { display: flex; gap: 8px; height: 32px; align-items: center; }
+    .day-num {
+      width: 48px; flex-shrink: 0; text-align: center; font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem; color: var(--text-dim);
+    }
+    .grid-row { display: flex; gap: 8px; height: 48px; align-items: center; }
+
+    /* Neon Tiles */
+    .tile {
+      width: 48px; height: 48px; flex-shrink: 0; background: var(--panel-bg);
+      border: 1px solid var(--panel-border); border-radius: 10px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
+      color: transparent; font-size: 1.2rem; font-weight: 900;
+    }
+    .tile.active {
+      background: linear-gradient(135deg, rgba(0, 255, 170, 0.2), rgba(0, 240, 255, 0.1));
+      border-color: var(--neon-green); color: var(--neon-green);
+      box-shadow: 0 0 12px var(--neon-green-glow), inset 0 0 8px var(--neon-green-glow);
+      transform: scale(0.96);
+    }
+    .delete-btn {
+      position: absolute; right: 4px; top: 4px; background: none; border: none;
+      color: #ef4444; font-size: 0.7rem; opacity: 0.5; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="app-title">NEXUS MATRIX</div>
+    <div class="nav-pills">
+      <div class="pill" id="month-display">SEP</div>
+      <div class="pill purple">CONFIG</div>
+    </div>
+  </header>
+
+  <div class="input-group">
+    <input type="text" id="goal-input" placeholder="Enter objective (e.g., Workout)...">
+    <button class="btn-add" onclick="addGoal()">ADD</button>
+  </div>
+
+  <div class="overall-card">
+    <div class="overall-header">
+      <span class="overall-label">MONTHLY COMPLETION OVERALL</span>
+      <span class="overall-val" id="overall-pct">0.0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="overall-bar"></div>
+    </div>
+  </div>
+
+  <div class="matrix-container">
+    <div class="goals-column" id="goals-list">
+      <div class="col-title">OBJECTIVES</div>
+      </div>
+
+    <div class="grid-column" id="grid-container">
+      <div class="days-header" id="days-header">
+        </div>
+      <div id="grid-rows">
+        </div>
+    </div>
+  </div>
+
+  <script>
+    const now = new Date();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    document.getElementById('month-display').innerText = now.toLocaleString('default', { month: 'SHORT' }).toUpperCase();
+
+    let goals = JSON.parse(localStorage.getItem('nexus_matrix_goals')) || [
+      { name: "Wake up at 06:00", days: { 1: true, 2: true, 3: true, 4: true, 5: true } },
+      { name: "Workout", days: { 1: true, 2: true, 3: true, 5: true, 6: true } },
+      { name: "Read 20 Pages", days: { 1: true, 3: true, 4: true } }
+    ];
+
+    function renderMatrix() {
+      const goalsList = document.getElementById('goals-list');
+      const daysHeader = document.getElementById('days-header');
+      const gridRows = document.getElementById('grid-rows');
+
+      // Clear previous elements
+      goalsList.innerHTML = '<div class="col-title">OBJECTIVES</div>';
+      daysHeader.innerHTML = '';
+      gridRows.innerHTML = '';
+
+      // Build Days Header
+      for (let d = 1; d <= daysInMonth; d++) {
+        daysHeader.innerHTML += `<div class="day-num">${d}</div>`;
+      }
+
+      let totalChecked = 0;
+      let totalPossible = goals.length * daysInMonth;
+
+      goals.forEach((goal, gIndex) => {
+        let activeCount = Object.values(goal.days || {}).filter(Boolean).length;
+        let pct = ((activeCount / daysInMonth) * 100).toFixed(0);
+        totalChecked += activeCount;
+
+        // Render Goal Title Card
+        const card = document.createElement('div');
+        card.className = 'goal-card';
+        card.innerHTML = `
+          <button class="delete-btn" onclick="deleteGoal(${gIndex})">✕</button>
+          <div class="goal-name">${goal.name}</div>
+          <div class="goal-stats">
+            <span style="color:var(--text-dim)">PROGRESS</span>
+            <span class="pct-text">${pct}%</span>
+          </div>
+        `;
+        goalsList.appendChild(card);
+
+        // Render Tile Row
+        const row = document.createElement('div');
+        row.className = 'grid-row';
+        for (let d = 1; d <= daysInMonth; d++) {
+          const isActive = goal.days && goal.days[d];
+          row.innerHTML += `
+            <div class="tile ${isActive ? 'active' : ''}" onclick="toggleTile(${gIndex}, ${d})">
+              ✓
+            </div>
+          `;
+        }
+        gridRows.appendChild(row);
+      });
+
+      // Update Overall Header Stats
+      let overallPct = totalPossible > 0 ? ((totalChecked / totalPossible) * 100).toFixed(1) : "0.0";
+      document.getElementById('overall-pct').innerText = `${overallPct}%`;
+      document.getElementById('overall-bar').style.width = `${overallPct}%`;
+    }
+
+    function toggleTile(gIndex, day) {
+      if (!goals[gIndex].days) goals[gIndex].days = {};
+      goals[gIndex].days[day] = !goals[gIndex].days[day];
+
+      // Mobile Haptic Feedback
+      if (navigator.vibrate) navigator.vibrate(25);
+
+      saveAndRender();
+    }
+
+    function addGoal() {
+      const input = document.getElementById('goal-input');
+      if (!input.value.trim()) return;
+      goals.push({ name: input.value.trim(), days: {} });
+      input.value = '';
+      saveAndRender();
+    }
+
+    function deleteGoal(gIndex) {
+      goals.splice(gIndex, 1);
+      saveAndRender();
+    }
+
+    function saveAndRender() {
+      localStorage.setItem('nexus_matrix_goals', JSON.stringify(goals));
+      renderMatrix();
+    }
+
+    renderMatrix();
+  </script>
+</body>
+</html>
