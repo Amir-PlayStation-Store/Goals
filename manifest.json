@@ -1,0 +1,20 @@
+{
+  "short_name": "NexusMatrix",
+  "name": "NEXUS Goal Matrix",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192/00f0ff/000000?text=NEXUS",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://via.placeholder.com/512/00f0ff/000000?text=NEXUS",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#07090e",
+  "theme_color": "#07090e",
+  "display": "standalone"
+}
